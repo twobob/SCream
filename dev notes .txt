@@ -1,0 +1,79 @@
+It occurs that I did not leave a copy of the original un-uriencoded code laying around
+
+javascript: (function() {
+	var el = document.createElement("div"),
+		b = document.getElementsByTagName("body")[0],
+		otherlib = !1,
+		msg = "";
+	el.style.position = "fixed", el.style.height = "32px", el.style.width = "220px", el.style.marginLeft = "-110px", el.style.top = "0", el.style.left = "50%", el.style.padding = "5px 10px", el.style.zIndex = 1001, el.style.fontSize = "12px", el.style.color = "#222", el.style.backgroundColor = "#f99";
+
+	function showMsg() {
+		var txt = document.createTextNode(msg);
+		el.appendChild(txt), b.appendChild(el), window.setTimeout(function() {
+			txt = null, typeof jQuery == "undefined" ? b.removeChild(el) : (jQuery(el).fadeOut("slow", function() {
+				jQuery(this).remove()
+			}), otherlib && (window.$jq = jQuery.noConflict()));
+			var jig = function() {
+				window.setTimeout(function() {
+					jQuery(document).scrollTop(jQuery(window).scrollTop() - 100)
+				}, 1);
+				window.setTimeout(function() {
+					jQuery(document).scrollTop(jQuery(window).scrollTop() + 100)
+				}, 2);
+				jQuery(document).scrollTop(jQuery(window).scrollTop() - 1);
+				jQuery(document).scrollTop(jQuery(window).scrollTop() + 1);
+			};
+			var timeout = null;
+			var mvms = function() {
+				clearTimeout(timeout);
+				jig();
+				timeout = setTimeout(cleanUpStream, 3000);
+			};
+			jQuery(document).on('mousemove', mvms()); /*handle counts and readout*/
+			var __cuLC = 0;
+			var __cuTC = 0;
+			var __stater = document.createElement('div');
+			jQuery(__stater).attr('id', 'tb1234').css('float', 'left').css('position', 'absolute').css('bottom', '0');
+			jQuery('.playControls__inner').append(__stater);
+
+			function cleanUpStream() {
+				if (window.location.href != 'https://soundcloud.com/stream') {
+					return;
+				};
+				__cuTC = jQuery('.soundList__item').length;
+				if (__cuLC == __cuTC) {
+					setTimeout(cleanUpStream, 10000);
+					return;
+				};
+				jQuery('.soundList__item').each(function(idx, thing) {
+					var cur = jQuery(thing);
+					if (cur.html().indexOf('sc-ministats-reposts') >= 0) cur.hide()
+				}) /* report results*/ ;
+				__cuLC == __cuTC;
+				jQuery('#tb1234').html('<p>' + __cuTC + ' records processed > ' + jQuery('.soundList__item').filter(function() {
+					return $(this).css('display') !== 'none';
+				}).length + ' actual posts</p> '); /* loop */
+				setTimeout(mvms, 3000);
+			};
+			cleanUpStream();
+			mvms();
+		}, 2500)
+	};;
+	if (typeof jQuery != "undefined") return msg = "Restarting v" + jQuery.fn.jquery, showMsg();
+	typeof $ == "function" && (otherlib = !0);
+
+	function getScript(url, success) {
+		var script = document.createElement("script");
+		script.src = url;
+		var head = document.getElementsByTagName("head")[0],
+			done = !1;
+		script.onload = script.onreadystatechange = function() {
+			!done && (!this.readyState || this.readyState == "loaded" || this.readyState == "complete") && (done = !0, success(), script.onload = script.onreadystatechange = null, head.removeChild(script))
+		}, head.appendChild(script)
+	}
+	getScript("//code.jquery.com/jquery.min.js", function() {
+		return typeof jQuery == "undefined" ? msg = "Sorry, but jQuery was not able to load" : (msg = "Starting Cleanup with v" + jQuery.fn.jquery, otherlib && (msg += " and noConflict(). Use $jq(), not $().")), showMsg()
+	})
+})();
+
+is roughly it.
